@@ -18,9 +18,9 @@ public class Main {
 	public static void main(String[] args) throws FileNotFoundException, IOException, ParseException {
 		Path currentRelativePath = Paths.get("");
 		String s = currentRelativePath.toAbsolutePath().toString();
-		
-		//extractItems(s);
-		//extractChampions(s);
+
+		// extractItems(s);
+		// extractChampions(s);
 		extractMasteries(s);
 	}
 
@@ -32,7 +32,7 @@ public class Main {
 		extraction(s + "/item.json", "data", newObjects -> {
 			System.out.println(newObjects[1] + ": " + newObjects[0]);
 			findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
-				String formattedString = ItemFormatter.replaceUnderscoreWithSpace(name);
+				String formattedString = ItemFormatter.replaceSpaceWithUnderscore(name);
 				return ItemFormatter.cutBrackets(formattedString);
 			});
 		}, "name", "id");
@@ -44,25 +44,26 @@ public class Main {
 		FileRenamer fileRenamer = new FileRenamer(Paths.get("dist").toString());
 
 		extraction(s + "/champ.json", "data", newObjects -> {
-			// System.out.println(newObjects[1] + ": " + newObjects[0]);
-				findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
-					String splited = ItemFormatter.splitCamelCase(name);
-					return splited.split("\\s+")[0];
-				});
-			}, "name", "id");
+			System.out.println(newObjects[1] + ": " + newObjects[0]);
+			findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
+				String splited = ItemFormatter.splitCamelCase(name);
+				return ItemFormatter.getFirstWordOfPhrase(splited);
+			});
+		}, "name", "id");
 	}
-	
+
 	private static void extractMasteries(String s) throws FileNotFoundException, IOException, ParseException {
 		FileFinder fileFinder = new FileFinder(s + "/masteryimages");
 		FileRenamer fileRenamer = new FileRenamer(Paths.get("dist").toString());
 
 		extraction(s + "/mastery.json", "data", newObjects -> {
-				System.out.println(newObjects[1] + ": " + newObjects[0]);
-				/*findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
-					String splited = ItemFormatter.splitCamelCase(name);
-					return splited.split("\\s+")[0];
-				});*/
-			}, "name", "id");
+			System.out.println(newObjects[1] + ": " + newObjects[0]);
+			findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
+				String splited = ItemFormatter.replaceHyphenWithSpace(name);
+				splited = ItemFormatter.toLowerCase(splited);
+				return ItemFormatter.getFirstWordOfPhrase(splited);
+			});
+		}, "name", "id");
 	}
 
 	private static void extraction(String pathToJson, String jsonRoot, ObjectExtractCallback callback, String... fields) throws FileNotFoundException, IOException, ParseException {
@@ -78,7 +79,7 @@ public class Main {
 		String formattedStr = function.format((String) objects[0]);
 		File[] files = fileFinder.search(formattedStr);
 		if (files.length == 0) {
-			System.out.println(formattedStr + " could not be found in JSON.");
+			System.out.println(formattedStr + " could not be found in file folder.");
 		}
 		for (int i = 0; i < files.length; i++) {
 			fileRenamer.rename(files[i], Long.toString((long) objects[1]));
