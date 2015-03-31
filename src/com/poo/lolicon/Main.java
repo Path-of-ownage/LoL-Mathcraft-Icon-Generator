@@ -16,18 +16,20 @@ import com.poo.lolicon.imageprocessors.IFileTransformer;
 public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, ParseException {
-		extractItems();
-		//extractChampions();
-	}
-
-	private static void extractItems() throws FileNotFoundException, IOException, ParseException {
 		Path currentRelativePath = Paths.get("");
 		String s = currentRelativePath.toAbsolutePath().toString();
+		
+		//extractItems(s);
+		//extractChampions(s);
+		extractMasteries(s);
+	}
 
+	@SuppressWarnings("unused")
+	private static void extractItems(String s) throws FileNotFoundException, IOException, ParseException {
 		FileFinder fileFinder = new FileFinder(s + "/images");
 		FileConverter fileRenamer = new FileConverter(Paths.get("dist").toString());
 
-		extraction(s + "/json.txt", "data", newObjects -> {
+		extraction(s + "/item.json", "data", newObjects -> {
 			System.out.println(newObjects[1] + ": " + newObjects[0]);
 			findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
 				String formattedString = ItemFormatter.replaceUnderscoreWithSpace(name);
@@ -36,19 +38,30 @@ public class Main {
 		}, "name", "id");
 	}
 
-	private static void extractChampions() throws FileNotFoundException, IOException, ParseException {
-		Path currentRelativePath = Paths.get("");
-		String s = currentRelativePath.toAbsolutePath().toString();
-
+	@SuppressWarnings("unused")
+	private static void extractChampions(String s) throws FileNotFoundException, IOException, ParseException {
 		FileFinder fileFinder = new FileFinder(s + "/champimages");
 		FileRenamer fileRenamer = new FileRenamer(Paths.get("dist").toString());
 
-		extraction(s + "/champjson.txt", "data", newObjects -> {
+		extraction(s + "/champ.json", "data", newObjects -> {
 			// System.out.println(newObjects[1] + ": " + newObjects[0]);
 				findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
 					String splited = ItemFormatter.splitCamelCase(name);
 					return splited.split("\\s+")[0];
 				});
+			}, "name", "id");
+	}
+	
+	private static void extractMasteries(String s) throws FileNotFoundException, IOException, ParseException {
+		FileFinder fileFinder = new FileFinder(s + "/masteryimages");
+		FileRenamer fileRenamer = new FileRenamer(Paths.get("dist").toString());
+
+		extraction(s + "/mastery.json", "data", newObjects -> {
+				System.out.println(newObjects[1] + ": " + newObjects[0]);
+				/*findAndRename(fileFinder, fileRenamer, newObjects, (name) -> {
+					String splited = ItemFormatter.splitCamelCase(name);
+					return splited.split("\\s+")[0];
+				});*/
 			}, "name", "id");
 	}
 
