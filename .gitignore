@@ -35,4 +35,12 @@ local.properties
 # TeXlipse plugin
 .texlipse
 
+# Gradle
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+
 dist
